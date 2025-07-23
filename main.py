@@ -1,8 +1,7 @@
 from Mappy import Mappy
 def main():
-  print('hello world')
-  m = Mappy(application_name = 'Task Manager')
-  pass
+  m = Mappy(application_name = 'Paint', shape='circle')
+
 
 if __name__ == '__main__':  
   main()
