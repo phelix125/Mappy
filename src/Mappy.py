@@ -4,10 +4,10 @@ from pywinauto import Desktop
 import sys
 import cv2
 import numpy as np
-from MiniMap import MiniMap
+from src.MiniMap import MiniMap
 class Mappy():
-    def __init__(self, application_name: str, shape: str):
-        self.minimap = MiniMap(application_name = application_name, shape=shape)
+    def __init__(self, application_name: str):
+        self.minimap = MiniMap(application_name = application_name)
         pass
     
     

@@ -4,13 +4,57 @@ from pywinauto import Desktop
 import sys
 import cv2
 import numpy as np
-class MiniMap():
-    def __init__(self, application_name : str, shape:str):
-        self.application_name = application_name
-        self.get_application_window_location()
-        self.find_minimap_candidates(shape=shape)
+import json
+import logging
+import os
 
-    def get_application_window_location(self):
+class MiniMapConfigParser():
+    SHAPE = 'shape'
+    QUADRANT = 'quadrant'
+    MIN_SIZE = 'min_size'
+    MAX_SIZE = 'min_size'
+    def __init__(self, data: dict):
+        self.data = data
+        pass
+    
+    def validate_config_values(self):
+        CONFIG_KEYS = [self.SHAPE, self.QUADRANT, self.MIN_SIZE, self.MAX_SIZE]
+        
+        for index, (key,value) in enumerate(self.data.items()):
+            match key:
+                case self.SHAPE:
+                    if(value.lower() not in ['circle', 'square']):
+                        logging.error('')
+                    
+        
+    
+    def is_valid_integer_input(self, value:int | float, min: int | float, max: int | float):
+        if(min < value and value < max):
+            return True
+        else:
+            return False
+            
+class MiniMap():
+    def __init__(self, application_name : str) -> None:
+        self.application_name = application_name
+        self._get_application_window_location()
+        self.setup_minimap_config()
+        self.find_minimap_candidates()
+        
+    def setup_minimap_config(self) -> None:
+        
+        config_path:str = "config\minimap_config.json"
+        
+        try:
+            with open(config_path, "r") as f:
+                config = json.load(f)
+                
+        except FileNotFoundError:
+            logging.error(f'File not found : Attempted file path {config_path}')
+            sys.exit(1)
+        
+
+    def _get_application_window_location(self):
         windows = Desktop(backend="win32").windows()
         for win in windows:
             if self.application_name in win.window_text():
@@ -25,8 +69,7 @@ class MiniMap():
         else:
             print("Window not found.")
             sys.exit()
-            
-            
+                   
     def _find_square_minimap_canidate(self, screenshot_file_path: str):
         img = cv2.imread(screenshot_file_path)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -72,9 +115,9 @@ class MiniMap():
             
         cv2.imwrite("minimap_detected.png", output_img)
         
-    def find_minimap_candidates(self, shape: str):
+    def find_minimap_candidates(self):
         
-        if(shape.lower() not in ['square', 'circle']):
+        if(self.config['shape'].lower() not in ['square', 'circle']):
             print('Invalid shape')
             sys.exit()
             
@@ -85,7 +128,7 @@ class MiniMap():
             self.application_window.get('Width'), 
             self.application_window.get('Height'))).save(screenshot_file_path)
         
-        match shape.lower():
+        match self.config['shape'].lower():
             case 'square':
                 self._find_square_minimap_canidate(screenshot_file_path=screenshot_file_path)
                 
