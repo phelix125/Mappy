@@ -7,70 +7,7 @@ import numpy as np
 import json
 import logging
 import os
-
-class MiniMapConfigParser():
-    SHAPE = 'shape'
-    QUADRANT = 'quadrant'
-    MIN_SIZE = 'min_size'
-    MAX_SIZE = 'min_size'
-    def __init__(self, data: dict):
-        self.data = data
-        #self.validate_config_values()
-        pass
-    
-    def get(self, key, is_num = False):
-        if(is_num):
-            return int(self.data[key])
-        try:
-            return self.data[key]
-        except KeyError:
-            logging.error(f'{key} not found')
-
-    
-    #def validate_config_values(self):
-    #    def invalid_input_message(key:str,value:str) -> bool:
-    #        return f'Value : {value} not valid for Key {key}'
-#
-    #    for index, (key,value) in enumerate(self.data.items()):
-    #        is_invalid_value:bool = False
-    #        match key:
-    #            case self.SHAPE:
-    #                if(value.lower() not in ['circle', 'square']):
-    #                    is_invalid_value = True
-    #            case self.QUADRANT:
-    #                if(value not in [1,2,3,4, '']):
-    #                    is_invalid_value = True
-    #                    
-    #            case self.MIN_SIZE | self.MAX_SIZE:
-    #                if(not self.is_valid_integer_input(value)):
-    #                    is_invalid_value = True
-    #            case _:
-    #                is_invalid_value = True
-    #                
-    #        if is_invalid_value:
-    #            logging.error(invalid_input_message(key,value))
-    
-    def is_valid_integer_input(
-            self,
-            value: int | float,
-            min: int | float = float('-inf'),
-            max: int | float = float('inf')
-        ) -> int | float:
-        
-        def to_number(value: str) -> int | float:
-            try:
-                return int(value)
-            except ValueError:
-                try:
-                    return float(value)
-                except ValueError:
-                    raise ValueError(f"Cannot convert '{value}' to int or float.")
-        value = to_number(value)
-        if(min < value and value < max):
-            return True
-        else:
-            return False
-            
+from src.MiniMapConfigParser import MiniMapConfigParser
 class MiniMap():
     def __init__(self, application_name : str) -> None:
         self.application_name = application_name
@@ -119,7 +56,7 @@ class MiniMap():
         for cnt in contours:
             approx = cv2.approxPolyDP(cnt, 0.05 * cv2.arcLength(cnt, True), True)
             if (len(approx) == 4 and
-                1000 < cv2.contourArea(cnt) < 5000
+                self.config.min_size < cv2.contourArea(cnt) < self.config.max_size
             ):
                 x, y, w, h = cv2.boundingRect(cnt)
                 aspect_ratio = w / float(h)
@@ -140,8 +77,8 @@ class MiniMap():
             minDist=100,
             param1=80,
             param2=50,
-            minRadius=80,
-            maxRadius=100
+            minRadius=self.config.min_size,
+            maxRadius=self.config.max_size
         )
 
         if circles is not None:
@@ -156,10 +93,6 @@ class MiniMap():
         cv2.imwrite("minimap_detected.png", output_img)
         
     def find_minimap_candidates(self):
-        
-        if(self.config.get(self.config.SHAPE).lower() not in ['square', 'circle']):
-            print('Invalid shape')
-            sys.exit()
             
         screenshot_file_path:str = 'Screenshot_TEMP.png'
         pyautogui.screenshot(region=(
@@ -168,7 +101,7 @@ class MiniMap():
             self.application_window.get('Width'), 
             self.application_window.get('Height'))).save(screenshot_file_path)
         
-        match self.config.get(self.config.SHAPE).lower():
+        match self.config.shape:
             case 'square':
                 self._find_square_minimap_canidate(screenshot_file_path=screenshot_file_path)
                 
