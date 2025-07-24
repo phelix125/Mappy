@@ -16,7 +16,7 @@ logging.basicConfig(
 )
 
 def main():
-  m = Mappy(application_name = 'Paint')
+  m = Mappy(application_name = 'Core Keeper')
   
   
 if __name__ == '__main__':  

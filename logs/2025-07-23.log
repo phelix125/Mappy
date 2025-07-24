@@ -7,3 +7,18 @@
 2025-07-23 17:41:15,956 [ERROR] File not found : Attempted file path c:\Users\pheli\OneDrive\Documents\Projects\Mappy\Mappy\src\config\minimap_config.json
 2025-07-23 17:41:36,617 [ERROR] File not found : Attempted file path c:\Users\pheli\OneDrive\Documents\Projects\Mappy\Mappy\src\config\minimap_config.json
 2025-07-23 17:42:02,070 [ERROR] File not found : Attempted file path \config\minmap_config.json
+2025-07-23 18:46:22,845 [ERROR] Value :  not valid for Key quadrant
+2025-07-23 18:46:22,846 [ERROR] Value : 0 not valid for Key max_size
+2025-07-23 18:46:22,847 [ERROR] Value : 100 not valid for Key min_size
+2025-07-23 18:46:55,205 [ERROR] Value :  not valid for Key quadrant
+2025-07-23 18:46:55,205 [ERROR] Value : 0 not valid for Key max_size
+2025-07-23 18:46:55,206 [ERROR] Value : 100 not valid for Key min_size
+2025-07-23 18:47:08,789 [ERROR] Value :  not valid for Key quadrant
+2025-07-23 18:47:08,790 [ERROR] Value : 0 not valid for Key max_size
+2025-07-23 18:47:08,790 [ERROR] Value : 100 not valid for Key min_size
+2025-07-23 18:47:21,641 [ERROR] Value : 0 not valid for Key max_size
+2025-07-23 18:47:21,641 [ERROR] Value : 100 not valid for Key min_size
+2025-07-23 18:54:54,420 [ERROR] Value : 0 not valid for Key max_size
+2025-07-23 18:55:57,293 [ERROR] Value : 0 not valid for Key max_size
+2025-07-23 18:56:58,144 [ERROR] Value : 0 not valid for Key max_size
+2025-07-23 18:59:22,832 [ERROR] Value : 0 not valid for Key max_size
