@@ -72,7 +72,7 @@ class MiniMap():
         sharpen_kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
         sharpen = cv2.filter2D(blur, -1, sharpen_kernel)
         
-        thresh = cv2.threshold(sharpen, 160, 255, cv2.THRESH_BINARY_INV)[1]
+        thresh = cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)[1]
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
         close = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=2)
         cnts = cv2.findContours(close, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
