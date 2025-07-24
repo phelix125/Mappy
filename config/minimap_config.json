@@ -1,6 +1,6 @@
 {
     "shape" : "square",
     "quadrant": "",             
-    "max_size":"150",
-    "min_size":"25"
+    "max_size":"250",
+    "min_size":"1002"
 }

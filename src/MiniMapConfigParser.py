@@ -39,8 +39,10 @@ class MiniMapConfigParser:
             key=self.MAX_SIZE,
             cast=int,
             required=True,
-            validate=lambda val: val >= 0 ,
-            error_msg="max_size must be a positive integer",
+            validate=[lambda val: val >= 0 , lambda val: val > self.min_size],
+            error_msg=["max_size must be a positive integer",
+                       "max_size must be larger then min_size"]
+            
         )
 
     def _parse_config(
@@ -49,23 +51,26 @@ class MiniMapConfigParser:
         cast: Callable[[Any], Any],
         required: bool = True,
         default: Any = None,
-        validate: Callable[[Any], bool] = lambda x: True,
-        error_msg: str = "Invalid value"
+        validate: Callable[[Any], bool] | list[Callable[[Any], bool]] = lambda x: True,
+        error_msg: str | list[str] = "Invalid value" 
     ) -> Any:
         raw_value = self.data.get(key, default)
-        
-        if ((raw_value is None or raw_value == "") and required):
+
+        if (raw_value is None or raw_value == "") and required:
             raise KeyError(f"Missing required config key: {key}")
-        elif(raw_value == "" or raw_value is None):
+        elif raw_value == "" or raw_value is None:
             raw_value = default
-        
+
         try:
             value = cast(raw_value)
         except (ValueError, TypeError):
             raise ValueError(f"{key}: expected {cast.__name__}, got '{raw_value}'")
 
-        if not validate(value):
-            raise ValueError(f"{key}: {error_msg}")
+        validators = validate if isinstance(validate, (list, tuple)) else [validate]
+
+        for idx,fn in enumerate(validators):
+            if not fn(value):
+                raise ValueError(f"{key}: {error_msg[idx]}")
 
         return value
 
