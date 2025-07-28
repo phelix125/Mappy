@@ -36,8 +36,8 @@ class MiniMap():
     tolerance: int = 10
 ) -> np.ndarray:
         """
-        Set's up MiniMaps internal minimap, used for pathtracking.
-
+        Set's up MiniMaps internal minimap, used for pathtracking. Itterates through the minimap
+        and scans each RGB value and sets it to a diffierent value
         Args:
             image_path (str): Path to the image file.
             rgb_to_label (Dict[Tuple[int, int, int], int]): Dictionary mapping RGB tuples to integer labels.
