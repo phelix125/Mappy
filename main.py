@@ -3,6 +3,7 @@ import logging
 import os
 from datetime import datetime
 
+
 log_dir = "logs"
 os.makedirs(log_dir, exist_ok=True)
 log_file = os.path.join(log_dir, f"{datetime.now():%Y-%m-%d}.log")
@@ -16,7 +17,9 @@ logging.basicConfig(
 )
 
 def main():
-  m = Mappy(application_name = 'Core Keeper')
+  m = Mappy(application_name = 'Paint')
+  m.setup()
+  
   
   
 if __name__ == '__main__':  
