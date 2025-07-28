@@ -7,7 +7,7 @@ import numpy as np
 import json
 import logging
 import os
-from typing import Tuple
+from typing import Tuple, Dict
 from PIL import ImageGrab
 from utils.MinimapGrabber import ScreenCropper
 from src.MiniMapConfigParser import MiniMapConfigParser
@@ -24,10 +24,10 @@ class MiniMap():
         screen_grabber = ScreenCropper()
         screen_grabber.run()
         self.minimap_coords = screen_grabber.get()
-        self.screenshot_minimap()
         self._setup_maze_array((30,30))
     
     def _setup_maze_array(self, resize:Tuple = None):
+        self.screenshot_minimap()
         tolerance = 128
         img = cv2.imread(self.MINIMAP_FILE_PATH, cv2.IMREAD_GRAYSCALE)
 
@@ -35,14 +35,34 @@ class MiniMap():
 
         maze_array = (binary // 255).astype(np.uint8)
         cv2.imwrite('bw-screenshot.png', binary)
-        print(len(maze_array), len(maze_array[0]))
         if(resize):
             resized = cv2.resize(img, (resize[0], resize[1]), interpolation=cv2.INTER_AREA)
             for i in resized:
                 for j in resize:
-                    print(j)
+                    pass
         return maze_array
-        
+    
+    def convert_image_to_label_array(
+        self,
+    image_path: str,
+    rgb_to_label: Dict[Tuple[int, int, int], int],
+    default_label: int = 0
+) -> np.ndarray:
+
+        bgr_img = cv2.imread(self.MINIMAP_FILE_PATH)
+        if bgr_img is None:
+            raise FileNotFoundError(f"Image not found or unreadable: {self.MINIMAP_FILE_PATH}")
+
+        rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+
+        height, width, _ = rgb_img.shape
+        label_array = np.full((height, width), default_label, dtype=np.int32)
+
+        for rgb_value, label in rgb_to_label.items():
+            match_mask = np.all(rgb_img == rgb_value, axis=-1)
+            label_array[match_mask] = label
+
+        return label_array
         
         
         
