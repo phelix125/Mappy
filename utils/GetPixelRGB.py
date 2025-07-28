@@ -30,7 +30,7 @@ def get_pixel_rgb_on_click():
 
     print("Click anywhere on the screen to get the pixel RGB value...")
     root.mainloop()
-
+    
     # Grab the pixel color from screen at clicked coordinates
     x, y = clicked_position['x'], clicked_position['y']
     screen = ImageGrab.grab(bbox=(x, y, x + 1, y + 1))

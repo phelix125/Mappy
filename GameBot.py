@@ -33,16 +33,16 @@ class GameBot(ABC):
     def update(self):
         rng_to_label = {
           (0, 0, 0) : 1,
-          (108, 45, 28) : 2,
-          (119, 145, 255) : 3
+          (132, 100, 53) : 2,
+          (28, 138, 218) : 3
         }
         self.mappy.minimap.screenshot_minimap() 
-        array_to_image(self.mappy.minimap.setup_internal_mini_map(rng_to_label, tolerance=30))
+        array_to_image(self.mappy.minimap.setup_internal_mini_map(rng_to_label))
         print('printed')
 
 
 
 if __name__ == "__main__":
-    time.sleep(1)
+    time.sleep(3)
     bot = GameBot(tick_rate=0.5)
     bot.start()

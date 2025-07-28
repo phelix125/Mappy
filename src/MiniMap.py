@@ -9,7 +9,10 @@ from typing import Tuple, Dict
 from PIL import ImageGrab
 from utils.MinimapGrabber import ScreenCropper
 from src.MiniMapConfigParser import MiniMapConfigParser
-
+from sklearn.cluster import KMeans
+import cv2
+import numpy as np
+from sklearn.cluster import KMeans
 class MiniMap():
     MINIMAP_FILE_PATH = 'minimap_screenshot.png'
     MINIMAP_CONFIG_FILE_PATH = 'config\minimap_config.json'
@@ -27,6 +30,53 @@ class MiniMap():
         screen_grabber = ScreenCropper()
         screen_grabber.run()
         self.minimap_coords = screen_grabber.get()
+        
+
+
+    def group_confident_colors(self, output_path='postprocess.png', num_colors=5, confidence_threshold=40):
+        """
+        Groups colors in an image and keeps only high-confidence pixels (close to cluster center).
+
+        Args:
+            input_path (str): Path to input image.
+            output_path (str, optional): Path to save output.
+            num_colors (int): Number of color clusters.
+            confidence_threshold (int): Max Euclidean distance from cluster center to keep a pixel.
+
+        Returns:
+            np.ndarray: Image with confident color regions drawn.
+        """
+        img = cv2.imread(self.MINIMAP_FILE_PATH)
+        if img is None:
+            raise FileNotFoundError(f"Cannot load image: {self.MINIMAP_FILE_PATH}")
+
+        h, w = img.shape[:2]
+        data = img.reshape((-1, 3))
+
+        # Fit KMeans
+        kmeans = KMeans(n_clusters=num_colors, random_state=42, n_init="auto")
+        labels = kmeans.fit_predict(data)
+        centers = kmeans.cluster_centers_
+        clustered = labels.reshape((h, w))
+
+        # Calculate distance of each pixel to its cluster center
+        distances = np.linalg.norm(data - centers[labels], axis=1).reshape((h, w))
+
+        output = np.zeros_like(img)
+
+        for i in range(num_colors):
+            mask = ((clustered == i) & (distances < confidence_threshold)).astype("uint8") * 255
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+            color = tuple(map(int, centers[i]))  # Use actual cluster color
+            for cnt in contours:
+                if cv2.contourArea(cnt) > 100:
+                    cv2.drawContours(output, [cnt], -1, color, -1)
+
+        if output_path:
+            cv2.imwrite(output_path, output)
+
+        return output
     
     
     def setup_internal_mini_map(
@@ -47,8 +97,8 @@ class MiniMap():
         Returns:
             np.ndarray: 2D array of labels.
         """
-
-        bgr_img = cv2.imread(self.MINIMAP_FILE_PATH)
+        self.group_confident_colors(num_colors=5)
+        bgr_img = cv2.imread('postprocess.png')
         if bgr_img is None:
             raise FileNotFoundError(f"Image not found or unreadable: {self.MINIMAP_FILE_PATH}")
 
