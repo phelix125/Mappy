@@ -42,26 +42,48 @@ class MiniMap():
         return maze_array
     
     def convert_image_to_label_array(
-        self,
-    image_path: str,
+    self,
     rgb_to_label: Dict[Tuple[int, int, int], int],
-    default_label: int = 0
+    default_label: int = 0,
+    tolerance: int = 10
 ) -> np.ndarray:
+        """
+        Converts an image into a labeled array using RGB values, allowing for tolerance in color matching.
+
+        Args:
+            image_path (str): Path to the image file.
+            rgb_to_label (Dict[Tuple[int, int, int], int]): Dictionary mapping RGB tuples to integer labels.
+            default_label (int): Label for pixels that don't match any RGB value.
+            tolerance (int): Tolerance for RGB matching (0–255). A pixel matches if each channel is within ±tolerance.
+
+        Returns:
+            np.ndarray: 2D array of labels.
+        """
 
         bgr_img = cv2.imread(self.MINIMAP_FILE_PATH)
         if bgr_img is None:
             raise FileNotFoundError(f"Image not found or unreadable: {self.MINIMAP_FILE_PATH}")
 
         rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
-
         height, width, _ = rgb_img.shape
         label_array = np.full((height, width), default_label, dtype=np.int32)
 
-        for rgb_value, label in rgb_to_label.items():
-            match_mask = np.all(rgb_img == rgb_value, axis=-1)
-            label_array[match_mask] = label
+        for target_rgb, label in rgb_to_label.items():
+            # Compute boolean mask where the color is within the tolerance
+            lower_bound = np.array([c - tolerance for c in target_rgb])
+            upper_bound = np.array([c + tolerance for c in target_rgb])
 
-        array_to_image(label_array)
+            # Clip values to valid range [0, 255]
+            lower_bound = np.clip(lower_bound, 0, 255)
+            upper_bound = np.clip(upper_bound, 0, 255)
+
+            # Generate mask for color within bounds
+            mask = np.all((rgb_img >= lower_bound) & (rgb_img <= upper_bound), axis=-1)
+
+            # Apply label
+            label_array[mask] = label
+
+        array_to_image(label_array)  
         return label_array
         
     def setup_minimap_config(self) -> None:

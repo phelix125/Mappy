@@ -20,6 +20,7 @@ def array_to_image(array: List[List[int]], output_path: str = "INTERNAL_MINIMAP.
         0: (255, 255, 255),  # White
         1: (0, 0, 0),        # Black
         2: (255, 0, 0),      # Blue (OpenCV uses BGR)
+        3: (83, 70, 64)
     }
 
     height = len(array)
