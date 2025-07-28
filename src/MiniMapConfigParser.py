@@ -2,48 +2,43 @@ import logging
 from typing import Any, Callable
 
 class MiniMapConfigParser:
-    SHAPE = 'shape'
-    QUADRANT = 'quadrant'
-    MIN_SIZE = 'min_size'
-    MAX_SIZE = 'max_size'
+    X = 'X'
+    Y = 'Y'
+    WIDTH = 'WIDTH'
+    HEIGHT = 'HEIGHT'
 
     def __init__(self, data: dict):
         self.data = data
 
-        self.shape: str = self._parse_config(
-            key=self.SHAPE,
-            cast=str,
-            required=True,
-            validate=lambda val: val.lower() in {'circle', 'square'},
-            error_msg="shape must be 'circle' or 'square'",
-        ).lower()
-
-        self.quadrant: int = self._parse_config(
-            key=self.QUADRANT,
-            cast=int,
-            required=False,
-            default=0,
-            validate=lambda val: val in {0, 1, 2, 3, 4},
-            error_msg="quadrant must be 1–4 or blank",
-        )
-
-        self.min_size: int = self._parse_config(
-            key=self.MIN_SIZE,
+        self.X: str = self._parse_config(
+            key=self.X,
             cast=int,
             required=True,
             validate=lambda val: val >= 0,
-            error_msg="min_size must be a positive integer",
+            error_msg="Value must be greated then 0",
         )
-
-        self.max_size: int = self._parse_config(
-            key=self.MAX_SIZE,
+        self.Y: str = self._parse_config(
+            key=self.Y,
             cast=int,
             required=True,
-            validate=[lambda val: val >= 0 , lambda val: val > self.min_size],
-            error_msg=["max_size must be a positive integer",
-                       "max_size must be larger then min_size"]
-            
+            validate=lambda val: val >= 0,
+            error_msg="Value must be greated then 0",
         )
+        self.WIDTH: str = self._parse_config(
+            key=self.WIDTH,
+            cast=int,
+            required=True,
+            validate=lambda val: val >= 0,
+            error_msg="Value must be greated then 0",
+        )
+        self.HEIGHT: str = self._parse_config(
+            key=self.HEIGHT,
+            cast=int,
+            required=True,
+            validate=lambda val: val >= 0,
+            error_msg="Value must be greated then 0",
+        )
+
 
     def _parse_config(
         self,
