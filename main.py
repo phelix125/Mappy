@@ -18,8 +18,13 @@ logging.basicConfig(
 
 def main():
   m = Mappy(application_name = 'Paint')
- # m.setup()
-  m.minimap.screenshot_minimap()
+  m.setup()
+  rng_to_label = {
+    (237, 28, 36) : 1,
+    (255, 127, 39) : 2
+  }
+  m.minimap.convert_image_to_label_array(None,rng_to_label)
+  #m.minimap.screenshot_minimap()
 
   
 

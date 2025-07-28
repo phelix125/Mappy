@@ -11,6 +11,7 @@ from typing import Tuple, Dict
 from PIL import ImageGrab
 from utils.MinimapGrabber import ScreenCropper
 from src.MiniMapConfigParser import MiniMapConfigParser
+from utils.PrintMemoryMiniMap import array_to_image
 class MiniMap():
     MINIMAP_FILE_PATH = 'minimap_screenshot.png'
     MINIMAP_CONFIG_FILE_PATH = 'config\minimap_config.json'
@@ -60,6 +61,7 @@ class MiniMap():
             match_mask = np.all(rgb_img == rgb_value, axis=-1)
             label_array[match_mask] = label
 
+        array_to_image(label_array)
         return label_array
         
     def setup_minimap_config(self) -> None:
