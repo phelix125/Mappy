@@ -2,6 +2,7 @@
 from src.MiniMap import MiniMap
 import logging
 import sys
+
 class Mappy():
     def __init__(self, application_name: str):
         self.minimap = MiniMap(application_name = application_name)
