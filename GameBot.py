@@ -5,21 +5,18 @@ from utils.PrintMemoryMiniMap import array_to_image
 
 class GameBot(ABC):
     def __init__(self, tick_rate: float = 10.0):
-        """
-        Initialize the bot with a given tick rate (in Hz).
-        """
         self.tick_rate = tick_rate
         self.running = False
+        self.ticks = 0
         self.mappy = Mappy('Paint')
         self.mappy.setup()
 
     def start(self):
-        """
-        Start the main event loop.
-        """
+        
         self.running = True
         try:
             while self.running:
+                self.ticks +=1
                 start_time = time.time()
                 self.update()
                 elapsed = time.time() - start_time
@@ -31,24 +28,21 @@ class GameBot(ABC):
             self.stop()
 
     def stop(self):
-        """
-        Stop the event loop.
-        """
         self.running = False
 
     def update(self):
         rng_to_label = {
-          (12, 11, 12) : 1,
-          (83, 70, 64) : 2,
-          (98, 96, 73) : 3
+          (0, 0, 0) : 1,
+          (132, 100, 53) : 2,
+          (28, 138, 218) : 3
         }
         self.mappy.minimap.screenshot_minimap() 
-        array_to_image(self.mappy.minimap.setup_internal_mini_map(rng_to_label, tolerance=30))
+        array_to_image(self.mappy.minimap.setup_internal_mini_map(rng_to_label))
         print('printed')
 
 
 
 if __name__ == "__main__":
-    time.sleep(5)
-    bot = GameBot(tick_rate=60.0)  # 5 ticks per second
+    time.sleep(3)
+    bot = GameBot(tick_rate=0.5)
     bot.start()
