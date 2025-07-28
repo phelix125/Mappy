@@ -13,9 +13,10 @@ from sklearn.cluster import KMeans
 import cv2
 import numpy as np
 from sklearn.cluster import KMeans
+from src.Constants import MINIMAP_FILE_PATH, MINIMAP_CONFIG_FILE_PATH
+import time
 class MiniMap():
-    MINIMAP_FILE_PATH = 'minimap_screenshot.png'
-    MINIMAP_CONFIG_FILE_PATH = 'config\minimap_config.json'
+
     HAS_VALID_CONFIG = False
     
     def __init__(self, application_name : str) -> None:
@@ -30,8 +31,8 @@ class MiniMap():
         screen_grabber = ScreenCropper()
         screen_grabber.run()
         self.minimap_coords = screen_grabber.get()
+        self.config.overide_data(self.minimap_coords)
         
-
 
     def group_confident_colors(self, output_path='postprocess.png', num_colors=5, confidence_threshold=40):
         """
@@ -46,9 +47,10 @@ class MiniMap():
         Returns:
             np.ndarray: Image with confident color regions drawn.
         """
-        img = cv2.imread(self.MINIMAP_FILE_PATH)
+        start = time.time()
+        img = cv2.imread(MINIMAP_FILE_PATH)
         if img is None:
-            raise FileNotFoundError(f"Cannot load image: {self.MINIMAP_FILE_PATH}")
+            raise FileNotFoundError(f"Cannot load image: {MINIMAP_FILE_PATH}")
 
         h, w = img.shape[:2]
         data = img.reshape((-1, 3))
@@ -72,12 +74,12 @@ class MiniMap():
             for cnt in contours:
                 if cv2.contourArea(cnt) > 100:
                     cv2.drawContours(output, [cnt], -1, color, -1)
-
+        
         if output_path:
             cv2.imwrite(output_path, output)
-
+        
+        print(time.time() - start , ' time elapsed')
         return output
-    
     
     def setup_internal_mini_map(
     self,
@@ -97,10 +99,10 @@ class MiniMap():
         Returns:
             np.ndarray: 2D array of labels.
         """
-        self.group_confident_colors(num_colors=5)
-        bgr_img = cv2.imread('postprocess.png')
+        #self.group_confident_colors(num_colors=8, confidence_threshold=30)
+        bgr_img = cv2.imread(MINIMAP_FILE_PATH)
         if bgr_img is None:
-            raise FileNotFoundError(f"Image not found or unreadable: {self.MINIMAP_FILE_PATH}")
+            raise FileNotFoundError(f"Image not found or unreadable: {MINIMAP_FILE_PATH}")
 
         rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
         height, width, _ = rgb_img.shape
@@ -109,7 +111,6 @@ class MiniMap():
         for target_rgb, label in rgb_to_label.items():
             lower_bound = np.array([c - tolerance for c in target_rgb])
             upper_bound = np.array([c + tolerance for c in target_rgb])
-
             lower_bound = np.clip(lower_bound, 0, 255)
             upper_bound = np.clip(upper_bound, 0, 255)
 
@@ -122,25 +123,35 @@ class MiniMap():
     def setup_minimap_config(self) -> None:
         
         try:
-            with open(self.MINIMAP_CONFIG_FILE_PATH, "r") as f:
+            with open(MINIMAP_CONFIG_FILE_PATH, "r") as f:
                 config = json.load(f)
                 self.config = MiniMapConfigParser(config)
                 self.HAS_VALID_CONFIG = True
                 
         except FileNotFoundError:
-            logging.error(f'File not found : Attempted file path {self.MINIMAP_CONFIG_FILE_PATH}')
+            logging.error(f'File not found : Attempted file path {MINIMAP_CONFIG_FILE_PATH}')
             sys.exit(1)
         
-    def screenshot_minimap(self):
-        if(self.config is None):
+    def screenshot_minimap(self, resize: float = None):
+        if(not self.HAS_VALID_CONFIG):
             logging.error('Config is not initialized properly')
             sys.exit(1)
+            
         img = ImageGrab.grab(bbox=(self.config.X,
                                    self.config.Y,
                                    self.config.X + self.config.WIDTH,
                                    self.config.Y + self.config.HEIGHT))
-        img.save(self.MINIMAP_FILE_PATH)
         
+        if(not resize):
+            img.save(MINIMAP_FILE_PATH)
+        else:
+            resized_height = self.config.HEIGHT * resize
+            resized_width = self.config.WIDTH * resize
+            screenshot_np = np.array(img)  
+            screenshot_bgr = cv2.cvtColor(screenshot_np, cv2.COLOR_RGB2BGR)
+            resized = cv2.resize(screenshot_bgr, (int(resized_height), int(resized_width)), interpolation=cv2.INTER_AREA)
+            cv2.imwrite(MINIMAP_FILE_PATH, resized)
+            
     def _get_application_window_location(self):
         windows = Desktop(backend="win32").windows()
         for win in windows:

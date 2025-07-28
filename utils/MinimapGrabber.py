@@ -50,14 +50,11 @@ class ScreenCropper:
         self.coordinates['Y'] = (int(y1))
         self.coordinates['WIDTH'] = int(width)
         self.coordinates['HEIGHT'] = int(height)
-        self.save_dict_to_json(self.coordinates,'config\minimap_config.json')
+        print(f' X: {x1} Y: {y1} WIDTH: {width} HEIGHT: {height}')
 
 
         self.root.destroy()
 
-    def save_dict_to_json(self, data: dict, file_path: str) -> None:
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=4)
     def run(self):
         self.root.mainloop()
         

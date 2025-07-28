@@ -32,13 +32,14 @@ class GameBot(ABC):
 
     def update(self):
         rng_to_label = {
-          (0, 0, 0) : 1,
-          (132, 100, 53) : 2,
-          (28, 138, 218) : 3
+            (26, 196, 84) : -1,
+            (0, 0, 0) : 0,
+            (166, 69, 42) : 1,
+            (114, 137, 255) : 2
         }
+        print('captured')
         self.mappy.minimap.screenshot_minimap() 
-        array_to_image(self.mappy.minimap.setup_internal_mini_map(rng_to_label))
-        print('printed')
+        array_to_image(self.mappy.minimap.setup_internal_mini_map(rng_to_label, tolerance= 20))
 
 
 

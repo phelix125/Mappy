@@ -1,6 +1,7 @@
 import logging
+import json
 from typing import Any, Callable
-
+from src.Constants import MINIMAP_CONFIG_FILE_PATH
 class MiniMapConfigParser:
     X = 'X'
     Y = 'Y'
@@ -38,8 +39,14 @@ class MiniMapConfigParser:
             validate=lambda val: val >= 0,
             error_msg="Value must be greated then 0",
         )
+    def overide_data(self, data):
+        self.data = data
+        self._save_dict_to_json()
 
-
+    def _save_dict_to_json(self) -> None:
+        with open(MINIMAP_CONFIG_FILE_PATH, 'w', encoding='utf-8') as f:
+            json.dump(self.data, f, indent=4)
+            
     def _parse_config(
         self,
         key: str,
