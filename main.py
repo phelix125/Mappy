@@ -2,7 +2,6 @@ from src.Mappy import Mappy
 import logging
 import os
 from datetime import datetime
-import time
 
 log_dir = "logs"
 os.makedirs(log_dir, exist_ok=True)
@@ -16,6 +15,7 @@ logging.basicConfig(
     ]
 )
 
+
 def main():
   m = Mappy(application_name = 'Paint')
   m.setup()
@@ -25,12 +25,9 @@ def main():
     (83, 70, 64) : 2,
     (98, 96, 73) : 3
   }
-  m.minimap.convert_image_to_label_array(rng_to_label, tolerance=30)
+  m.minimap.setup_internal_mini_map(rng_to_label, tolerance=30)
   
 
-  
-
-  
-  
 if __name__ == '__main__':  
   main()
+
